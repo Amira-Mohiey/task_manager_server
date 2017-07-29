@@ -1,4 +1,6 @@
+
 from tastypie.resources import ModelResource,ALL,ALL_WITH_RELATIONS
+
 from tastypie.authorization import  Authorization
 from tastypie.authentication import BasicAuthentication
 from .models import Task,Project
@@ -9,9 +11,14 @@ from tastypie.utils import trailing_slash
 from django.conf.urls import url
 
 class UserResource(ModelResource):
+    # tasks = fields.ToManyField('task_manager.api.resources.TaskResource','tasks', null=True, blank=True)
     class Meta:
         queryset = User.objects.all()
         authorization = Authorization()
+
+        filtering = {
+            'username': ALL
+        }
         authentication = BasicAuthentication()
         resource_name = 'user'
         filtering = {
@@ -52,10 +59,13 @@ class ProjectResource(ModelResource):
         allowed_methods = ['get', 'post', 'put', 'delete']
 
 
+
 class TaskResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'created_by')
+
     assigned_to = fields.ForeignKey(UserResource, 'assigned_to')
     project = fields.ForeignKey(ProjectResource, 'project')
+
 
     class Meta:
         filtering = {
@@ -69,5 +79,6 @@ class TaskResource(ModelResource):
         authorization = Authorization()
         authentication = BasicAuthentication()
         allowed_methods = ['get', 'post', 'put', 'delete']
+
 
 
